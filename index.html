@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBERPC | Next-Gen PC Building & Components</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            colors: {
+              'dark-base': '#080C14',
+              'dark-surface': '#0F172A',
+              'dark-card': '#131D31',
+              'dark-card-hover': '#1A2744',
+              'dark-border': '#1E293B',
+              'dark-border-light': '#334155',
+              
+              // Neon Tech Colors
+              'neon-cyan': '#00F0FF',
+              'neon-blue': '#3B82F6',
+              'neon-purple': '#A855F7',
+              'neon-emerald': '#10B981',
+              'neon-rose': '#F43F5E',
+
+              // Compatible aliases for existing code
+              'primary': '#0F172A',
+              'secondary': '#080C14',
+              'accent': '#00F0FF',
+              'highlight': '#38BDF8',
+              'text-primary': '#F8FAFC',
+              'text-secondary': '#94A3B8',
+              'border-color': '#1E293B',
+            },
+            boxShadow: {
+              'neon-cyan': '0 0 20px -3px rgba(0, 240, 255, 0.35)',
+              'neon-purple': '0 0 20px -3px rgba(168, 85, 247, 0.35)',
+              'neon-emerald': '0 0 20px -3px rgba(16, 185, 129, 0.35)',
+              'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+            }
+          },
+        },
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.546.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-dark-base text-text-primary antialiased selection:bg-neon-cyan/20 selection:text-neon-cyan">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
