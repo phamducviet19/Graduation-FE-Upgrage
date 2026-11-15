@@ -35,8 +35,11 @@ const ImportManagementPage: React.FC = () => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const supplierData = await api.get<{ data: Supplier[] }>('/supplier');
-        setSuppliers(Array.isArray(supplierData.data) ? supplierData.data : []);
+        const supplierData = await api.get<any>('/supplier');
+        const supplierList = Array.isArray(supplierData?.data)
+          ? supplierData.data
+          : (Array.isArray(supplierData) ? supplierData : []);
+        setSuppliers(supplierList);
       } catch (err) {
         console.error("Failed to fetch suppliers", err);
       }
@@ -66,7 +69,7 @@ const ImportManagementPage: React.FC = () => {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
       const matchesSearch = searchTerm
-        ? item.Supplier.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        ? item.Supplier?.name?.toLowerCase().includes(lowerCaseSearchTerm) ||
           item.id.toString().includes(lowerCaseSearchTerm)
         : true;
 
@@ -109,6 +112,22 @@ const ImportManagementPage: React.FC = () => {
   const handleSuccess = () => {
     handleCloseFormModal();
     setRefreshTrigger(t => t + 1);
+  };
+
+  const handleSaveImport = async (importData: {
+    supplier_id: number;
+    import_date: string;
+    details: { product_id: number; quantity: number; unit_price: string }[];
+  }) => {
+    try {
+      await api.post('/import', importData);
+      alert('Tạo phiếu nhập kho thành công!');
+      handleSuccess();
+    } catch (err: any) {
+      console.error("Lưu phiếu nhập kho thất bại:", err);
+      alert(`Tạo phiếu nhập kho thất bại:\n${err.message || 'Lỗi server'}`);
+      throw err;
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -278,6 +297,7 @@ const ImportManagementPage: React.FC = () => {
       <ImportFormModal
         isOpen={isFormModalOpen}
         onClose={handleCloseFormModal}
+        onSave={handleSaveImport}
         onSuccess={handleSuccess}
         suppliers={suppliers}
       />
@@ -286,7 +306,7 @@ const ImportManagementPage: React.FC = () => {
         <ImportDetailModal
           isOpen={isDetailModalOpen}
           onClose={handleCloseDetailModal}
-          importReceipt={selectedImport}
+          receipt={selectedImport}
         />
       )}
     </div>
