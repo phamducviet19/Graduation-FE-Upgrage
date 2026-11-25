@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePCBuild } from '../../contexts/PCBuildContext';
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/common/Spinner';
+import Pagination from '../../components/common/Pagination';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { Trash2, Edit, PlusCircle, Wrench, Sparkles, ArrowRight, Calendar } from 'lucide-react';
 
 const PCBuildListPage: React.FC = () => {
@@ -11,15 +13,24 @@ const PCBuildListPage: React.FC = () => {
     fetchBuilds();
   }, [fetchBuilds]);
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const [buildToDelete, setBuildToDelete] = useState<number | null>(null);
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(builds.length / itemsPerPage);
+  const paginatedBuilds = builds.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   const calculateTotal = (build: any) => {
     if (!build.PcBuildDetails) return 0;
     return build.PcBuildDetails.reduce((acc: number, detail: any) => acc + parseFloat(detail.Product.price), 0);
   };
 
+  const confirmDelete = async () => {
+    if (buildToDelete === null) return;
+    await deleteBuild(buildToDelete);
+  };
+
   const handleDelete = (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa cấu hình này không?')) {
-      deleteBuild(id);
-    }
+    setBuildToDelete(id);
   };
 
   return (
@@ -83,61 +94,77 @@ const PCBuildListPage: React.FC = () => {
       )}
 
       {!loading && builds.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {builds.map(build => (
-            <div 
-              key={build.id} 
-              className="p-5 border border-slate-800/90 rounded-2xl bg-slate-950/80 hover:border-slate-700 transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <h2 className="text-base font-bold text-white group-hover:text-neon-cyan transition-colors">
-                    {build.name}
-                  </h2>
-                  <div className="flex items-center space-x-1.5 shrink-0">
-                    <Link 
-                      to={`/pcbuild/${build.id}`} 
-                      className="p-2 text-slate-400 hover:text-neon-cyan hover:bg-slate-900 rounded-xl transition-colors border border-transparent hover:border-slate-800" 
-                      title="Chỉnh sửa cấu hình"
-                    >
-                      <Edit size={16} />
-                    </Link>
-                    <button 
-                      onClick={() => handleDelete(build.id)} 
-                      className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors" 
-                      title="Xóa cấu hình"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {paginatedBuilds.map(build => (
+              <div 
+                key={build.id} 
+                className="p-5 border border-slate-800/90 rounded-2xl bg-slate-950/80 hover:border-slate-700 transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <h2 className="text-base font-bold text-white group-hover:text-neon-cyan transition-colors">
+                      {build.name}
+                    </h2>
+                    <div className="flex items-center space-x-1.5 shrink-0">
+                      <Link 
+                        to={`/pcbuild/${build.id}`} 
+                        className="p-2 text-slate-400 hover:text-neon-cyan hover:bg-slate-900 rounded-xl transition-colors border border-transparent hover:border-slate-800" 
+                        title="Chỉnh sửa cấu hình"
+                      >
+                        <Edit size={16} />
+                      </Link>
+                      <button 
+                        onClick={() => handleDelete(build.id)} 
+                        className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors" 
+                        title="Xóa cấu hình"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-500 mt-2">
+                    <Calendar size={13} />
+                    <span>Ngày tạo: {new Date(build.created_at).toLocaleDateString('vi-VN')}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-500 mt-2">
-                  <Calendar size={13} />
-                  <span>Ngày tạo: {new Date(build.created_at).toLocaleDateString('vi-VN')}</span>
+                <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono text-slate-400 uppercase">Tổng linh kiện</span>
+                    <p className="text-lg font-mono font-black text-neon-cyan">
+                      {calculateTotal(build).toLocaleString('vi-VN')} ₫
+                    </p>
+                  </div>
+
+                  <Link
+                    to={`/pcbuild/${build.id}`}
+                    className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-mono font-bold text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-1.5"
+                  >
+                    <span>Chi tiết</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
               </div>
-
-              <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Tổng linh kiện</span>
-                  <p className="text-lg font-mono font-black text-neon-cyan">
-                    {calculateTotal(build).toLocaleString('vi-VN')} ₫
-                  </p>
-                </div>
-
-                <Link
-                  to={`/pcbuild/${build.id}`}
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-mono font-bold text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-1.5"
-                >
-                  <span>Chi tiết</span>
-                  <ArrowRight size={13} />
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
+
+      <ConfirmModal
+        isOpen={buildToDelete !== null}
+        onClose={() => setBuildToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa cấu hình PC"
+        message="Bạn có chắc chắn muốn xóa bản lưu cấu hình này? Thao tác này không thể hoàn tác."
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Order, Payment, User } from '../../types';
 import api from '../../services/api';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { 
   ChevronLeft, ChevronRight, User as UserIcon, Package, CreditCard, 
   Save, AlertCircle, CheckCircle2 
@@ -272,6 +273,7 @@ const OrderHistory: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [cancelingOrderId, setCancelingOrderId] = useState<number | null>(null);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -294,16 +296,19 @@ const OrderHistory: React.FC = () => {
         fetchOrders();
     }, [fetchOrders]);
 
-    const handleCancelOrder = async (orderId: number) => {
-        if(window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
-            try {
-                await api.patch(`/order/${orderId}/cancel`, {});
-                fetchOrders();
-            } catch (err: any) {
-                alert(err.message || 'Hủy đơn hàng thất bại.');
-            }
+    const confirmCancelOrder = async () => {
+        if (cancelingOrderId === null) return;
+        try {
+            await api.patch(`/order/${cancelingOrderId}/cancel`, {});
+            fetchOrders();
+        } catch (err: any) {
+            alert(err.message || 'Hủy đơn hàng thất bại.');
         }
-    }
+    };
+
+    const handleCancelOrder = (orderId: number) => {
+        setCancelingOrderId(orderId);
+    };
 
     // Pagination Logic
     const totalPages = Math.ceil(orders.length / itemsPerPage);
@@ -375,6 +380,15 @@ const OrderHistory: React.FC = () => {
                   />
                 </>
             )}
+
+            <ConfirmModal
+              isOpen={cancelingOrderId !== null}
+              onClose={() => setCancelingOrderId(null)}
+              onConfirm={confirmCancelOrder}
+              title="Hủy đơn hàng"
+              message="Bạn có chắc chắn muốn hủy đơn hàng này không? Sau khi xác nhận, đơn hàng sẽ được hủy."
+              confirmText="Xác nhận hủy"
+            />
         </div>
     );
 }

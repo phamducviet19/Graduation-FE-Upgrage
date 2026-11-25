@@ -100,14 +100,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Image Frame */}
-      <div className="relative pt-[85%] w-full overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-6 flex items-center justify-center">
+      <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-6 flex items-center justify-center">
         <img 
           src={imageUrl} 
           alt={product.name} 
-          className="absolute inset-0 w-full h-full object-contain p-6 group-hover:scale-105 transition-transform duration-500 ease-out"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60 pointer-events-none"></div>
       </div>
 
       {/* Content Details */}

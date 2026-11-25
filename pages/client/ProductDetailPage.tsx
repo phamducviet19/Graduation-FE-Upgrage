@@ -151,7 +151,7 @@ const ProductDetailPage: React.FC = () => {
                   <button 
                     key={index} 
                     onClick={() => setActiveImage(img)} 
-                    className={`w-20 h-20 rounded-2xl overflow-hidden p-2 bg-slate-950 border-2 transition-all ${
+                    className={`w-20 h-20 rounded-2xl overflow-hidden p-2 bg-slate-950 border-2 transition-all flex items-center justify-center shrink-0 aspect-square ${
                       activeImage === img ? 'border-neon-cyan shadow-neon-cyan scale-105' : 'border-slate-800 hover:border-slate-600'
                     }`}
                   >

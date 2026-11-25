@@ -6,6 +6,7 @@ import ImportFormModal from '../../components/admin/ImportFormModal';
 import ImportDetailModal from '../../components/admin/ImportDetailModal';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const ImportManagementPage: React.FC = () => {
   const [imports, setImports] = useState<ImportReceipt[]>([]);
@@ -15,6 +16,7 @@ const ImportManagementPage: React.FC = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedImport, setSelectedImport] = useState<ImportReceipt | null>(null);
+  const [importToDelete, setImportToDelete] = useState<number | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [inputValue, setInputValue] = useState('');
@@ -130,15 +132,18 @@ const ImportManagementPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa phiếu nhập kho này? Tồn kho các sản phẩm liên quan sẽ bị trừ lại.')) {
-      try {
-        await api.delete(`/import/${id}`);
-        setRefreshTrigger(t => t + 1);
-      } catch (err: any) {
-        alert(`Xóa thất bại:\n${err.message || 'Lỗi server'}`);
-      }
+  const confirmDelete = async () => {
+    if (importToDelete === null) return;
+    try {
+      await api.delete(`/import/${importToDelete}`);
+      setRefreshTrigger(t => t + 1);
+    } catch (err: any) {
+      alert(`Xóa thất bại:\n${err.message || 'Lỗi server'}`);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setImportToDelete(id);
   };
 
   const resetFilters = () => {
@@ -309,6 +314,15 @@ const ImportManagementPage: React.FC = () => {
           receipt={selectedImport}
         />
       )}
+
+      <ConfirmModal
+        isOpen={importToDelete !== null}
+        onClose={() => setImportToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa phiếu nhập kho"
+        message="Bạn có chắc chắn muốn xóa phiếu nhập kho này? Tồn kho các sản phẩm liên quan sẽ bị trừ lại."
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 };

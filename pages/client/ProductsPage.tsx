@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { Product, Category, Brand } from '../../types';
 import ProductCard from '../../components/client/ProductCard';
 import Spinner from '../../components/common/Spinner';
+import Pagination from '../../components/common/Pagination';
 import FilterSidebar from '../../components/client/FilterSidebar';
 import { SlidersHorizontal, ArrowUpDown, Layers, PackageX } from 'lucide-react';
 
@@ -92,6 +93,20 @@ const ProductsPage: React.FC = () => {
 
     return result;
   }, [products, searchTerm, brandFilter, categoryFilter, minPrice, maxPrice, sortBy]);
+
+  // Pagination Logic (9 sản phẩm mỗi trang: lưới 3x3)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, brandFilter, categoryFilter, minPrice, maxPrice, sortBy]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredProducts, currentPage, itemsPerPage]);
 
   const filterSidebarProps = {
     categories,
@@ -199,11 +214,21 @@ const ProductsPage: React.FC = () => {
 
           {!loading && !error && (
             filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedProducts.map(product => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    setCurrentPage(page);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
+              </>
             ) : (
               <div className="text-center py-20 bg-slate-900/40 rounded-3xl border border-slate-800/80 p-8">
                 <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-500 mx-auto mb-4">

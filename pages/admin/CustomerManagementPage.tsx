@@ -4,6 +4,7 @@ import { User } from '../../types';
 import { Trash2, Search, Users, RotateCcw, Mail, Phone, MapPin } from 'lucide-react';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const CustomerManagementPage: React.FC = () => {
   const [customers, setCustomers] = useState<User[]>([]);
@@ -12,6 +13,7 @@ const CustomerManagementPage: React.FC = () => {
 
   const [inputValue, setInputValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [customerToDelete, setCustomerToDelete] = useState<number | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -40,15 +42,18 @@ const CustomerManagementPage: React.FC = () => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa khách hàng này?')) {
-      try {
-        await api.delete(`/customer/${id}`);
-        setCustomers(prev => prev.filter(c => c.id !== id));
-      } catch (err) {
-        alert('Xóa khách hàng thất bại. Vui lòng thử lại.');
-      }
+  const confirmDelete = async () => {
+    if (customerToDelete === null) return;
+    try {
+      await api.delete(`/customer/${customerToDelete}`);
+      setCustomers(prev => prev.filter(c => c.id !== customerToDelete));
+    } catch (err: any) {
+      alert(`Xóa khách hàng thất bại:\n${err.message || 'Vui lòng thử lại.'}`);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setCustomerToDelete(id);
   };
 
   const filteredCustomers = useMemo(() => {
@@ -175,6 +180,15 @@ const CustomerManagementPage: React.FC = () => {
           )}
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={customerToDelete !== null}
+        onClose={() => setCustomerToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa tài khoản khách hàng"
+        message="Bạn có chắc chắn muốn xóa khách hàng này? Thao tác này sẽ xóa vĩnh viễn thông tin tài khoản."
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 };

@@ -94,7 +94,7 @@ const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({
                   onClick={() => onSelectProduct(product)}
                 >
                   <div>
-                    <div className="w-full h-36 bg-slate-950 rounded-xl p-3 flex items-center justify-center mb-3 border border-slate-850">
+                    <div className="w-full h-36 aspect-square sm:aspect-auto flex items-center justify-center bg-slate-950 rounded-xl p-3 mb-3 border border-slate-850 overflow-hidden">
                       <img 
                         src={product.mainImage ? `${API_HOST}${product.mainImage}` : `https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=200&q=80`} 
                         alt={product.name} 

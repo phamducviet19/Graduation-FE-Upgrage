@@ -5,6 +5,7 @@ import { PlusCircle, Edit, Trash2, Search, Truck, RotateCcw } from 'lucide-react
 import SupplierFormModal from '../../components/admin/SupplierFormModal';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const SupplierManagementPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -12,6 +13,7 @@ const SupplierManagementPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supplierToEdit, setSupplierToEdit] = useState<Supplier | null>(null);
+  const [supplierToDelete, setSupplierToDelete] = useState<number | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [inputValue, setInputValue] = useState('');
@@ -93,15 +95,18 @@ const SupplierManagementPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa nhà cung cấp này?')) {
-      try {
-        await api.delete(`/supplier/${id}`);
-        setSuppliers(prev => prev.filter(s => s.id !== id));
-      } catch (err) {
-        alert('Xóa nhà cung cấp thất bại. Vui lòng thử lại.');
-      }
+  const confirmDelete = async () => {
+    if (supplierToDelete === null) return;
+    try {
+      await api.delete(`/supplier/${supplierToDelete}`);
+      setSuppliers(prev => prev.filter(s => s.id !== supplierToDelete));
+    } catch (err: any) {
+      alert(`Xóa nhà cung cấp thất bại:\n${err.message || 'Vui lòng thử lại.'}`);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setSupplierToDelete(id);
   };
 
   return (
@@ -231,6 +236,15 @@ const SupplierManagementPage: React.FC = () => {
         onClose={handleCloseModal}
         onSave={handleSaveSupplier}
         supplierToEdit={supplierToEdit}
+      />
+
+      <ConfirmModal
+        isOpen={supplierToDelete !== null}
+        onClose={() => setSupplierToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa nhà cung cấp"
+        message="Bạn có chắc chắn muốn xóa nhà cung cấp này? Thao tác này không thể hoàn tác."
+        confirmText="Xác nhận xóa"
       />
     </div>
   );

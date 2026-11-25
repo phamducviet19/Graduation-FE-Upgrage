@@ -5,6 +5,7 @@ import { PlusCircle, Edit, Trash2, Search, List, RotateCcw } from 'lucide-react'
 import SimpleFormModal from '../../components/admin/SimpleFormModal';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const CategoryManagementPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -14,6 +15,7 @@ const CategoryManagementPage: React.FC = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Pagination
@@ -66,15 +68,18 @@ const CategoryManagementPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
-      try {
-        await api.delete(`/category/${id}`);
-        setCategories(prev => prev.filter(c => c.id !== id));
-      } catch (err) {
-        alert('Xóa danh mục thất bại. Vui lòng thử lại.');
-      }
+  const confirmDelete = async () => {
+    if (categoryToDelete === null) return;
+    try {
+      await api.delete(`/category/${categoryToDelete}`);
+      setCategories(prev => prev.filter(c => c.id !== categoryToDelete));
+    } catch (err: any) {
+      alert(`Xóa danh mục thất bại:\n${err.message || 'Vui lòng thử lại.'}`);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setCategoryToDelete(id);
   };
 
   const filteredCategories = useMemo(() => {
@@ -215,6 +220,15 @@ const CategoryManagementPage: React.FC = () => {
         onSave={handleSaveCategory}
         title={categoryToEdit ? "Sửa Danh Mục" : "Thêm Danh Mục Mới"}
         initialValue={categoryToEdit ? categoryToEdit.name : ""}
+      />
+
+      <ConfirmModal
+        isOpen={categoryToDelete !== null}
+        onClose={() => setCategoryToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa danh mục"
+        message="Bạn có chắc chắn muốn xóa danh mục này? Các linh kiện thuộc danh mục này có thể bị ảnh hưởng."
+        confirmText="Xác nhận xóa"
       />
     </div>
   );

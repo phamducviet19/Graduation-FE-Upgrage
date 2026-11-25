@@ -5,6 +5,7 @@ import { PlusCircle, Edit, Trash2, Search, Tag, RotateCcw } from 'lucide-react';
 import SimpleFormModal from '../../components/admin/SimpleFormModal';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const BrandManagementPage: React.FC = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -14,6 +15,7 @@ const BrandManagementPage: React.FC = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [brandToEdit, setBrandToEdit] = useState<Brand | null>(null);
+  const [brandToDelete, setBrandToDelete] = useState<number | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Pagination
@@ -66,15 +68,18 @@ const BrandManagementPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa thương hiệu này?')) {
-      try {
-        await api.delete(`/brand/${id}`);
-        setBrands(prev => prev.filter(b => b.id !== id));
-      } catch (err) {
-        alert('Xóa thương hiệu thất bại. Vui lòng thử lại.');
-      }
+  const confirmDelete = async () => {
+    if (brandToDelete === null) return;
+    try {
+      await api.delete(`/brand/${brandToDelete}`);
+      setBrands(prev => prev.filter(b => b.id !== brandToDelete));
+    } catch (err: any) {
+      alert(`Xóa thương hiệu thất bại:\n${err.message || 'Vui lòng thử lại.'}`);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setBrandToDelete(id);
   };
 
   const filteredBrands = useMemo(() => {
@@ -215,6 +220,15 @@ const BrandManagementPage: React.FC = () => {
         onSave={handleSaveBrand}
         title={brandToEdit ? "Sửa Thương Hiệu" : "Thêm Thương Hiệu Mới"}
         initialValue={brandToEdit ? brandToEdit.name : ""}
+      />
+
+      <ConfirmModal
+        isOpen={brandToDelete !== null}
+        onClose={() => setBrandToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa thương hiệu"
+        message="Bạn có chắc chắn muốn xóa thương hiệu này? Thao tác này không thể hoàn tác."
+        confirmText="Xác nhận xóa"
       />
     </div>
   );

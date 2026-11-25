@@ -322,11 +322,13 @@ const PCBuildPage: React.FC = () => {
 
                           {selected ? (
                             <div className="flex items-center gap-3 overflow-hidden">
-                              <img 
-                                src={getImageUrl(selected)} 
-                                alt={selected.name} 
-                                className="hidden sm:block w-12 h-12 object-contain bg-slate-900 rounded-xl p-1 border border-slate-800 shrink-0"
-                              />
+                              <div className="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900 p-1 border border-slate-800 shrink-0 aspect-square items-center justify-center overflow-hidden">
+                                <img 
+                                  src={getImageUrl(selected)} 
+                                  alt={selected.name} 
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
                               <div className="overflow-hidden">
                                 <p className="font-semibold text-xs sm:text-sm text-white truncate">{selected.name}</p>
                                 <p className="text-xs font-mono font-bold text-neon-cyan mt-0.5">

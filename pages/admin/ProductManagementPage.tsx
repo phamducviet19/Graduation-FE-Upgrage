@@ -5,6 +5,7 @@ import { PlusCircle, Edit, Trash2, Search, Package, Layers, Tag, RotateCcw } fro
 import ProductFormModal from '../../components/admin/ProductFormModal';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 interface ProductsByCategoryProps {
   category: Category;
@@ -43,16 +44,21 @@ const ProductsByCategory: React.FC<ProductsByCategoryProps> = ({
     fetchProducts();
   }, [fetchProducts, refreshTrigger]);
 
-  const handleDelete = async (productId: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa linh kiện này khỏi hệ thống?')) {
-      try {
-        await api.delete(`/product/${productId}`);
-        setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
-      } catch (error) {
-        console.error('Failed to delete product', error);
-        alert('Xóa sản phẩm thất bại. Vui lòng thử lại.');
-      }
+  const [productToDelete, setProductToDelete] = useState<number | null>(null);
+
+  const confirmDelete = async () => {
+    if (productToDelete === null) return;
+    try {
+      await api.delete(`/product/${productToDelete}`);
+      setProducts(prevProducts => prevProducts.filter(p => p.id !== productToDelete));
+    } catch (error: any) {
+      console.error('Failed to delete product', error);
+      alert(`Xóa sản phẩm thất bại:\n${error.message || 'Lỗi server'}`);
     }
+  };
+
+  const handleDelete = (productId: number) => {
+    setProductToDelete(productId);
   };
 
   const filteredProducts = products.filter(product => {
@@ -163,6 +169,15 @@ const ProductsByCategory: React.FC<ProductsByCategoryProps> = ({
           </>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={productToDelete !== null}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Xóa linh kiện"
+        message="Bạn có chắc chắn muốn xóa linh kiện này khỏi hệ thống? Thao tác này không thể hoàn tác."
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 };
