@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, AlertTriangle, Trash2 } from 'lucide-react';
 
 interface ConfirmModalProps {
@@ -42,13 +43,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   const loading = isLoading || internalLoading;
 
-  return (
+  const modalContent = (
     <div 
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-in fade-in duration-150"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex justify-center items-center p-4"
       onClick={loading ? undefined : onClose}
     >
       <div 
-        className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-7 animate-in fade-in zoom-in-95 duration-200"
+        className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 sm:p-7"
+        style={{ maxWidth: '28rem' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-4">
@@ -100,6 +102,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 };
 
 export default ConfirmModal;

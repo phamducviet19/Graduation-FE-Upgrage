@@ -124,7 +124,7 @@ const PaymentSuccessPage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Link 
-            to="/profile" 
+            to="/profile?tab=orders" 
             className="flex items-center justify-center gap-2 bg-neon-cyan text-dark-base font-extrabold px-8 py-3.5 rounded-xl shadow-neon-cyan hover:bg-highlight hover:scale-[1.02] active:scale-95 transition-all text-xs font-mono tracking-wider"
           >
             <span>THEO DÕI ĐƠN HÀNG</span>

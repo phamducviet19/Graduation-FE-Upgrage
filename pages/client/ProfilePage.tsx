@@ -1,18 +1,40 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Order, Payment, User } from '../../types';
 import api from '../../services/api';
 import Spinner from '../../components/common/Spinner';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import ClientOrderDetailModal from '../../components/client/ClientOrderDetailModal';
 import { 
   ChevronLeft, ChevronRight, User as UserIcon, Package, CreditCard, 
-  Save, AlertCircle, CheckCircle2 
+  Save, AlertCircle, CheckCircle2, XCircle, Eye 
 } from 'lucide-react';
 
 type Tab = 'profile' | 'orders' | 'payments';
 
 const ProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('profile');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const resolvedTab: Tab =
+    tabParam === 'orders' || tabParam === 'payments' || tabParam === 'profile'
+      ? tabParam
+      : 'profile';
+
+  const [activeTab, setActiveTab] = useState<Tab>(resolvedTab);
+
+  useEffect(() => {
+    setActiveTab(resolvedTab);
+  }, [resolvedTab]);
+
+  const handleSelectTab = (tab: Tab) => {
+    setActiveTab(tab);
+    if (tab === 'profile') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ tab });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -29,7 +51,7 @@ const ProfilePage: React.FC = () => {
         <div className="md:w-1/4">
           <nav className="bg-slate-900/90 backdrop-blur-xl p-3 sm:p-4 rounded-2xl border border-slate-800 shadow-xl space-y-1.5">
             <button 
-              onClick={() => setActiveTab('profile')} 
+              onClick={() => handleSelectTab('profile')} 
               className={`w-full flex items-center gap-3 font-semibold p-3 rounded-xl transition-all duration-200 group ${
                 activeTab === 'profile' 
                   ? 'bg-neon-cyan/15 text-neon-cyan border border-neon-cyan/40 shadow-[0_0_15px_rgba(0,240,255,0.15)]' 
@@ -42,7 +64,7 @@ const ProfilePage: React.FC = () => {
               <span>Hồ sơ cá nhân</span>
             </button>
             <button 
-              onClick={() => setActiveTab('orders')} 
+              onClick={() => handleSelectTab('orders')} 
               className={`w-full flex items-center gap-3 font-semibold p-3 rounded-xl transition-all duration-200 group ${
                 activeTab === 'orders' 
                   ? 'bg-neon-cyan/15 text-neon-cyan border border-neon-cyan/40 shadow-[0_0_15px_rgba(0,240,255,0.15)]' 
@@ -55,7 +77,7 @@ const ProfilePage: React.FC = () => {
               <span>Đơn hàng của tôi</span>
             </button>
             <button 
-              onClick={() => setActiveTab('payments')} 
+              onClick={() => handleSelectTab('payments')} 
               className={`w-full flex items-center gap-3 font-semibold p-3 rounded-xl transition-all duration-200 group ${
                 activeTab === 'payments' 
                   ? 'bg-neon-cyan/15 text-neon-cyan border border-neon-cyan/40 shadow-[0_0_15px_rgba(0,240,255,0.15)]' 
@@ -273,7 +295,9 @@ const OrderHistory: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [cancelingOrderId, setCancelingOrderId] = useState<number | null>(null);
+    const [cancelingOrder, setCancelingOrder] = useState<Order | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -297,18 +321,22 @@ const OrderHistory: React.FC = () => {
     }, [fetchOrders]);
 
     const confirmCancelOrder = async () => {
-        if (cancelingOrderId === null) return;
+        if (!cancelingOrder) return;
+        setActionMessage(null);
         try {
-            await api.patch(`/order/${cancelingOrderId}/cancel`, {});
-            fetchOrders();
+            await api.patch(`/order/${cancelingOrder.id}/cancel`, {});
+            setActionMessage({ type: 'success', text: `Đã hủy đơn hàng #${cancelingOrder.id} thành công.` });
+            await fetchOrders();
         } catch (err: any) {
-            alert(err.message || 'Hủy đơn hàng thất bại.');
+            setActionMessage({ type: 'error', text: err.message || 'Hủy đơn hàng thất bại.' });
         }
     };
 
-    const handleCancelOrder = (orderId: number) => {
-        setCancelingOrderId(orderId);
+    const handleCancelOrder = (order: Order) => {
+        setCancelingOrder(order);
     };
+
+    const canCancelOrder = (status: Order['status']) => status === 'Pending' || status === 'Confirmed';
 
     // Pagination Logic
     const totalPages = Math.ceil(orders.length / itemsPerPage);
@@ -326,6 +354,16 @@ const OrderHistory: React.FC = () => {
               <Package className="text-neon-cyan" size={24} />
               <span>Đơn hàng của tôi</span>
             </h2>
+            {actionMessage && (
+              <div className={`mb-4 p-4 rounded-xl text-sm flex items-center gap-2.5 border ${
+                actionMessage.type === 'success'
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                  : 'bg-rose-500/15 border-rose-500/30 text-rose-400'
+              }`}>
+                {actionMessage.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                <span>{actionMessage.text}</span>
+              </div>
+            )}
             {orders.length === 0 ? (
                 <div className="text-center py-12 bg-slate-950/40 rounded-2xl border border-slate-800">
                     <Package className="mx-auto text-slate-600 mb-3" size={40} />
@@ -341,7 +379,8 @@ const OrderHistory: React.FC = () => {
                                       <div className="flex items-center gap-2.5 mb-1.5">
                                           <p className="font-bold text-base sm:text-lg text-white">Đơn hàng #{order.id}</p>
                                           <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${
-                                              order.status === 'Confirmed' || order.status === 'Shipped' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' :
+                                              order.status === 'Shipped' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' :
+                                              order.status === 'Confirmed' ? 'bg-cyan-500/15 text-neon-cyan border-neon-cyan/30' :
                                               order.status === 'Cancelled' ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' :
                                               'bg-amber-500/15 text-amber-400 border-amber-500/30'
                                           }`}>
@@ -350,13 +389,28 @@ const OrderHistory: React.FC = () => {
                                       </div>
                                       <p className="text-xs text-slate-400">Ngày đặt: {new Date(order.order_date).toLocaleDateString('vi-VN')}</p>
                                   </div>
-                                  <div className="text-left sm:text-right mt-1 sm:mt-0">
+                                  <div className="text-left sm:text-right mt-1 sm:mt-0 flex flex-col sm:items-end gap-2">
                                       <p className="font-extrabold text-base sm:text-lg text-neon-cyan">{parseFloat(order.total_amount).toLocaleString('vi-VN')} ₫</p>
-                                      {order.status === 'Pending' && (
-                                          <button onClick={() => handleCancelOrder(order.id)} className="text-xs text-rose-400 hover:text-rose-300 hover:underline mt-1 font-medium transition-colors">
-                                            Hủy đơn hàng
-                                          </button>
-                                      )}
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => setSelectedOrder(order)}
+                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-neon-cyan border border-neon-cyan/30 hover:bg-cyan-500/20 transition-all"
+                                        >
+                                          <Eye size={14} />
+                                          <span>Xem chi tiết</span>
+                                        </button>
+                                        {canCancelOrder(order.status) && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleCancelOrder(order)}
+                                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 hover:text-rose-300 transition-all"
+                                            >
+                                              <XCircle size={14} />
+                                              <span>Hủy đơn hàng</span>
+                                            </button>
+                                        )}
+                                      </div>
                                   </div>
                               </div>
                               <div className="border-t border-slate-800/80 mt-3 pt-3">
@@ -364,7 +418,7 @@ const OrderHistory: React.FC = () => {
                                   <div className="space-y-1.5">
                                       {order.OrderDetails.map(detail => (
                                           <div key={detail.id} className="text-sm flex justify-between text-slate-300">
-                                              <span>{detail.Product.name} <span className="text-slate-500 text-xs">x{detail.quantity}</span></span>
+                                              <span>{detail.Product?.name || 'Sản phẩm'} <span className="text-slate-500 text-xs">x{detail.quantity}</span></span>
                                               <span className="font-medium text-slate-200">{(detail.quantity * parseFloat(detail.price)).toLocaleString('vi-VN')} ₫</span>
                                           </div>
                                       ))}
@@ -381,12 +435,23 @@ const OrderHistory: React.FC = () => {
                 </>
             )}
 
+            <ClientOrderDetailModal
+              isOpen={selectedOrder !== null}
+              onClose={() => setSelectedOrder(null)}
+              order={selectedOrder}
+              onCancelOrder={handleCancelOrder}
+            />
+
             <ConfirmModal
-              isOpen={cancelingOrderId !== null}
-              onClose={() => setCancelingOrderId(null)}
+              isOpen={cancelingOrder !== null}
+              onClose={() => setCancelingOrder(null)}
               onConfirm={confirmCancelOrder}
-              title="Hủy đơn hàng"
-              message="Bạn có chắc chắn muốn hủy đơn hàng này không? Sau khi xác nhận, đơn hàng sẽ được hủy."
+              title={`Hủy đơn hàng #${cancelingOrder?.id ?? ''}`}
+              message={
+                cancelingOrder?.status === 'Confirmed'
+                  ? 'Đơn hàng này đã được xác nhận. Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác này không thể hoàn tác.'
+                  : 'Bạn có chắc chắn muốn hủy đơn hàng này không? Sau khi xác nhận, đơn hàng sẽ được hủy.'
+              }
               confirmText="Xác nhận hủy"
             />
         </div>

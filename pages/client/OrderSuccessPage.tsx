@@ -16,7 +16,7 @@ const OrderSuccessPage: React.FC = () => {
           Đơn hàng của bạn đã được tiếp nhận thành công. Bạn có thể theo dõi hành trình và cập nhật trạng thái trong tài khoản.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link to="/profile" className="flex items-center justify-center gap-2 bg-neon-cyan text-dark-base font-extrabold px-6 py-3.5 rounded-xl shadow-neon-cyan hover:bg-highlight hover:scale-[1.02] active:scale-95 transition-all text-xs font-mono tracking-wider">
+          <Link to="/profile?tab=orders" className="flex items-center justify-center gap-2 bg-neon-cyan text-dark-base font-extrabold px-6 py-3.5 rounded-xl shadow-neon-cyan hover:bg-highlight hover:scale-[1.02] active:scale-95 transition-all text-xs font-mono tracking-wider">
             <span>XEM ĐƠN HÀNG CỦA TÔI</span>
             <ArrowRight size={16} />
           </Link>

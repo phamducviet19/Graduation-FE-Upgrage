@@ -235,7 +235,7 @@ const ComparePage: React.FC = () => {
                   </button>
                   
                   <div>
-                    <div className="w-full h-44 aspect-square flex items-center justify-center mb-4 bg-slate-900/60 rounded-xl p-4 border border-slate-800/80 overflow-hidden">
+                    <div className="w-full aspect-square max-h-48 flex items-center justify-center mb-4 bg-slate-900/60 rounded-xl p-4 border border-slate-800/80 overflow-hidden">
                       <img 
                         src={product.mainImage ? `${API_HOST}${product.mainImage}` : `https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=200&q=80`} 
                         alt={product.name} 
