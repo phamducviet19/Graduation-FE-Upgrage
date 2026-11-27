@@ -1,10 +1,15 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from '../components/client/Header';
 import Footer from '../components/client/Footer';
 import Chatbot from '../components/client/Chatbot';
 
 const ClientLayout: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [pathname]);
   return (
     <div className="flex flex-col min-h-screen bg-ambient-cyber text-text-primary relative selection:bg-neon-cyan/20 selection:text-neon-cyan">
       {/* Ambient Top Glow Line */}

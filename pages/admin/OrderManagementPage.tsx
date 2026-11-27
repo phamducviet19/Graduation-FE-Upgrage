@@ -107,9 +107,9 @@ const OrderManagementPage: React.FC = () => {
       setIsStatusModalOpen(false);
       setSelectedOrder(null);
       setRefreshTrigger(t => t + 1);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to update order status:", err);
-      alert('Cập nhật trạng thái đơn hàng thất bại. Vui lòng thử lại.');
+      alert(err?.message || 'Cập nhật trạng thái đơn hàng thất bại. Vui lòng thử lại.');
     }
   };
 

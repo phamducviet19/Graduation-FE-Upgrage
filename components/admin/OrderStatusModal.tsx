@@ -44,6 +44,13 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({ isOpen, onClose, on
   const isShipped = order.status === 'Shipped';
   const isCancelled = order.status === 'Cancelled';
 
+  const isStatusDisabled = (status: OrderStatus): boolean => {
+    if (isShipped || isCancelled) return true;
+    if (order.status === 'Pending' && status === 'Shipped') return true;
+    if (order.status === 'Confirmed' && status === 'Pending') return true;
+    return false;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center p-4" onClick={onClose}>
       <div 
@@ -82,11 +89,22 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({ isOpen, onClose, on
                 disabled={isShipped || isCancelled}
               >
                 {availableStatuses.map(status => (
-                  <option key={status} value={status} className="bg-slate-900">
+                  <option
+                    key={status}
+                    value={status}
+                    disabled={isStatusDisabled(status)}
+                    className="bg-slate-900 disabled:text-slate-600"
+                  >
                     {statusLabels[status] || status}
+                    {order.status === 'Pending' && status === 'Shipped' ? ' (Cần Confirmed trước)' : ''}
                   </option>
                 ))}
               </select>
+              {order.status === 'Pending' && (
+                <p className="text-slate-400 text-xs mt-2 font-sans">
+                  Lưu ý: Đơn hàng đang chờ xử lý phải chuyển sang <strong className="text-neon-cyan">Confirmed</strong> trước khi chuyển sang <strong className="text-neon-emerald">Shipped</strong>.
+                </p>
+              )}
               {isShipped && (
                 <p className="text-amber-400 text-xs mt-2 flex items-center gap-1 font-sans">
                   <AlertTriangle size={14} /> Đơn hàng đã giao thành công không thể đổi trạng thái.
