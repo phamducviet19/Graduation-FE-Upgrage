@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import api from '../../services/api';
 import { Category } from '../../types';
-import { PlusCircle, Edit, Trash2, Search, List, RotateCcw } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Search, List, RotateCcw, SlidersHorizontal } from 'lucide-react';
 import SimpleFormModal from '../../components/admin/SimpleFormModal';
+import CategoryAttributesModal from '../../components/admin/CategoryAttributesModal';
 import Pagination from '../../components/common/Pagination';
 import Spinner from '../../components/common/Spinner';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -16,6 +17,7 @@ const CategoryManagementPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
+  const [categoryForAttributes, setCategoryForAttributes] = useState<Category | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Pagination
@@ -162,7 +164,7 @@ const CategoryManagementPage: React.FC = () => {
                 <tr>
                   <th scope="col" className="px-5 py-3.5 w-24">ID</th>
                   <th scope="col" className="px-5 py-3.5">Tên Danh Mục</th>
-                  <th scope="col" className="px-5 py-3.5 text-right w-32">Thao Tác</th>
+                  <th scope="col" className="px-5 py-3.5 text-right w-48">Thao Tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 bg-slate-900/50">
@@ -174,6 +176,14 @@ const CategoryManagementPage: React.FC = () => {
                     </th>
                     <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => setCategoryForAttributes(cat)} 
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-cyan-500/10 text-neon-cyan border border-neon-cyan/30 hover:bg-cyan-500/20 transition-colors font-mono text-[11px] font-semibold"
+                          title="Xem & thêm thuộc tính"
+                        >
+                          <SlidersHorizontal size={13} />
+                          <span>Thuộc tính</span>
+                        </button>
                         <button 
                           onClick={() => handleOpenEditModal(cat)} 
                           className="p-1.5 rounded-lg bg-slate-800 text-neon-cyan hover:bg-slate-700 transition-colors"
@@ -220,6 +230,12 @@ const CategoryManagementPage: React.FC = () => {
         onSave={handleSaveCategory}
         title={categoryToEdit ? "Sửa Danh Mục" : "Thêm Danh Mục Mới"}
         initialValue={categoryToEdit ? categoryToEdit.name : ""}
+      />
+
+      <CategoryAttributesModal
+        isOpen={categoryForAttributes !== null}
+        onClose={() => setCategoryForAttributes(null)}
+        category={categoryForAttributes}
       />
 
       <ConfirmModal

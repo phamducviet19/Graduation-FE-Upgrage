@@ -108,7 +108,7 @@ const PaymentManagementPage: React.FC = () => {
           className="bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-neon-cyan cursor-pointer"
         >
           <option value="" className="bg-slate-950">Tất cả trạng thái</option>
-          <option value="Completed" className="bg-slate-950">Completed (Thành công)</option>
+          <option value="Success" className="bg-slate-950">Success (Thành công)</option>
           <option value="Pending" className="bg-slate-950">Pending (Đang chờ)</option>
           <option value="Failed" className="bg-slate-950">Failed (Thất bại)</option>
         </select>

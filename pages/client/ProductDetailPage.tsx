@@ -124,11 +124,11 @@ const ProductDetailPage: React.FC = () => {
           
           {/* Left: Image Gallery */}
           <div className="space-y-4">
-            <div className="aspect-square bg-slate-950/80 rounded-3xl p-8 flex items-center justify-center border border-slate-800 relative overflow-hidden group">
+            <div className="aspect-square bg-slate-950/80 rounded-3xl flex items-center justify-center border border-slate-800 relative overflow-hidden group">
               <img 
                 src={activeImage || placeholder} 
                 alt={product.name} 
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               {/* Status Badge */}
               <div className="absolute top-4 left-4">
@@ -151,11 +151,11 @@ const ProductDetailPage: React.FC = () => {
                   <button 
                     key={index} 
                     onClick={() => setActiveImage(img)} 
-                    className={`w-20 h-20 rounded-2xl overflow-hidden p-2 bg-slate-950 border-2 transition-all flex items-center justify-center shrink-0 aspect-square ${
+                    className={`w-20 h-20 rounded-2xl overflow-hidden bg-slate-950 border-2 transition-all flex items-center justify-center shrink-0 aspect-square ${
                       activeImage === img ? 'border-neon-cyan shadow-neon-cyan scale-105' : 'border-slate-800 hover:border-slate-600'
                     }`}
                   >
-                    <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-contain"/>
+                    <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover"/>
                   </button>
                 ))}
               </div>

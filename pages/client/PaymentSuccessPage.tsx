@@ -77,7 +77,7 @@ const PaymentSuccessPage: React.FC = () => {
 
         <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Thanh Toán Thành Công!</h1>
         <p className="text-slate-400 mb-8 text-base max-w-lg mx-auto">
-          Cảm ơn bạn đã tin tưởng mua sắm. Đơn hàng <span className="font-bold text-neon-cyan font-mono">#{orderIdParam}</span> của bạn đã được xác nhận.
+          Cảm ơn bạn đã tin tưởng mua sắm. Đơn hàng <span className="font-bold text-neon-cyan font-mono">#{orderIdParam}</span> của bạn đã thanh toán thành công và đang chờ xử lý.
         </p>
 
         {order && (

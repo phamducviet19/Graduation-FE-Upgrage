@@ -322,11 +322,11 @@ const PCBuildPage: React.FC = () => {
 
                           {selected ? (
                             <div className="flex items-center gap-3 overflow-hidden">
-                              <div className="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900 p-1 border border-slate-800 shrink-0 aspect-square items-center justify-center overflow-hidden">
+                              <div className="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 shrink-0 aspect-square items-center justify-center overflow-hidden">
                                 <img 
                                   src={getImageUrl(selected)} 
                                   alt={selected.name} 
-                                  className="w-full h-full object-contain"
+                                  className="w-full h-full object-cover"
                                 />
                               </div>
                               <div className="overflow-hidden">

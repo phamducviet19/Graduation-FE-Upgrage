@@ -57,7 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <Link 
       to={`/product/${product.id}`} 
-      className="group relative flex flex-col bg-slate-900/70 backdrop-blur-md rounded-2xl border border-slate-800/90 hover:border-neon-cyan/50 hover:shadow-[0_8px_30px_rgba(0,240,255,0.15)] transition-all duration-300 overflow-hidden transform hover:-translate-y-1.5"
+      className="group relative flex flex-col h-full bg-slate-900/70 backdrop-blur-md rounded-2xl border border-slate-800/90 hover:border-neon-cyan/50 hover:shadow-[0_8px_30px_rgba(0,240,255,0.15)] transition-all duration-300 overflow-hidden transform hover:-translate-y-1.5"
     >
       {/* Top Floating Badges */}
       <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 pointer-events-none">
@@ -100,11 +100,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Image Frame */}
-      <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/60 p-6 flex items-center justify-center">
+      <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/60 flex items-center justify-center">
         <img 
           src={imageUrl} 
           alt={product.name} 
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60 pointer-events-none"></div>

@@ -66,11 +66,11 @@ const CartPage: React.FC = () => {
             <div key={item.product_id} className="py-5 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4">
               {/* Product Info */}
               <div className="flex items-center gap-4 flex-grow w-full sm:w-auto">
-                <div className="w-20 h-20 rounded-2xl bg-slate-950 p-2 border border-slate-800 flex items-center justify-center shrink-0 aspect-square overflow-hidden">
+                <div className="w-20 h-20 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center shrink-0 aspect-square overflow-hidden">
                   <img 
                     src={item.Product.mainImage ? `${API_HOST}${item.Product.mainImage}` : `https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=200&q=80`} 
                     alt={item.Product.name} 
-                    className="w-full h-full object-contain" 
+                    className="w-full h-full object-cover" 
                   />
                 </div>
                 <div>
